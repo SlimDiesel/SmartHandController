@@ -3,9 +3,8 @@
 
 #include "Axis.h"
 
-#ifdef AXIS_PRESENT
+#ifdef MOTOR_PRESENT
 
-#include "Axis.h"
 #include "../convert/Convert.h"
 
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -63,14 +62,16 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
       if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
       if (index + 1 != axisNumber) return false; // command wasn't processed
       DriverStatus status = getStatus();
-      strcat(reply, status.standstill ? "ST," : ",");
-      strcat(reply, status.outputA.openLoad ? "OA," : ",");
-      strcat(reply, status.outputB.openLoad ? "OB," : ",");
-      strcat(reply, status.outputA.shortToGround ? "GA," : ",");
-      strcat(reply, status.outputB.shortToGround ? "GB," : ",");
-      strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
-      strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
-      strcat(reply, status.fault ? "GF" : "");
+      if (status.active) {
+        strcat(reply, status.standstill ? "ST," : ",");
+        strcat(reply, status.outputA.openLoad ? "OA," : ",");
+        strcat(reply, status.outputB.openLoad ? "OB," : ",");
+        strcat(reply, status.outputA.shortToGround ? "GA," : ",");
+        strcat(reply, status.outputB.shortToGround ? "GB," : ",");
+        strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
+        strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
+        strcat(reply, status.fault ? "GF" : "");
+      } else { *commandError = CE_0; return true; }
       *numericReply = false;
     } else return false;
   } else
