@@ -19,19 +19,17 @@ void keyPadWrapper() { keyPad.poll(); }
 void UI::init(const char version[], const int pin[7], const int active[7], const int SerialBaud, const OLED model) {
   serialBaud = SerialBaud;
 
+  // get nv ready
   if (!nv.isKeyValid(INIT_NV_KEY)) {
     VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
-    nv.wipe();
-    VLF("MSG: NV, waiting for commit");
-    nv.wait();
-    VLF("MSG: NV, resetting to defaults");
+    if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
   } else { VLF("MSG: NV, correct key found"); }
 
   // confirm the data structure size
   if (DisplaySettingsSize < sizeof(DisplaySettings)) { nv.initError = true; DL("ERR: UserInterface::setup(); DisplaySettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: UserInterface, writing defaults to NV");
     nv.writeBytes(NV_DISPLAY_SETTINGS_BASE, &displaySettings, sizeof(DisplaySettings));
   }
@@ -40,9 +38,12 @@ void UI::init(const char version[], const int pin[7], const int active[7], const
   nv.readBytes(NV_DISPLAY_SETTINGS_BASE, &displaySettings, sizeof(DisplaySettings));
 
   // init is done, write the NV key if necessary
-  if (!nv.isKeyValid()) {
-    nv.writeKey((uint32_t)INIT_NV_KEY);
-    if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV, failed to read back key!"); } else { VLF("MSG: NV, reset complete"); }
+  if (!nv.hasValidKey()) {
+    if (!nv.initError) {
+      nv.writeKey((uint32_t)INIT_NV_KEY);
+      nv.wait();
+      if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV, failed to read back key!"); } else { VLF("MSG: NV, reset complete"); }
+    }
   }
 
   if (strlen(version) <= 19) strcpy(_version, version);
