@@ -29,8 +29,8 @@
 
 #define Product               "SHC"
 #define FirmwareVersionMajor  "3"
-#define FirmwareVersionMinor  "02"
-#define FirmwareVersionPatch  "g"
+#define FirmwareVersionMinor  "03"
+#define FirmwareVersionPatch  "b"
 
 #include "src/Common.h"
 NVS nv;
