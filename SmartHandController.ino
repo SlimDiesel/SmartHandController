@@ -1,7 +1,7 @@
 /*
 * Title       Smart Hand Controller (based on TeenAstro)
 *
-* Copyright (C) 2018 to 2022 Charles Lemaire, Howard Dutton, and Others
+* Copyright (C) 2018 to 2023 Charles Lemaire, Howard Dutton, and Others
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #define Product               "SHC"
 #define FirmwareVersionMajor  "4"
 #define FirmwareVersionMinor  "00"
-#define FirmwareVersionPatch  "b"
+#define FirmwareVersionPatch  "e"
 
 #include "src/Common.h"
 NVS nv;
@@ -57,9 +57,9 @@ void systemServices() {
     char command[80];
 
     switch (i++ % 3) {
-      case 0: sprintF(command, ":SX9A,%0.1f#", weather.getTemperature()); SERIAL_ONSTEP.print(command); break;
-      case 1: sprintF(command, ":SX9B,%0.1f#", weather.getPressure()); SERIAL_ONSTEP.print(command); break;
-      case 2: sprintF(command, ":SX9C,%0.1f#", weather.getHumidity()); SERIAL_ONSTEP.print(command); break;
+      case 0: sprintF(command, ":SX9A,%0.1f#", weather.getTemperature()); onStep.Set(command); break;
+      case 1: sprintF(command, ":SX9B,%0.1f#", weather.getPressure()); onStep.Set(command); break;
+      case 2: sprintF(command, ":SX9C,%0.1f#", weather.getHumidity()); onStep.Set(command); break;
     }
   }
 #endif
